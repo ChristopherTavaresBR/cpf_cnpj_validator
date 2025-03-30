@@ -7,7 +7,7 @@ pub struct ValidationResponse {
     pub number: String,
     pub formatted: String,
     pub anonymized: String,
-    pub anonymized_key: Option<String>,  // Agora é opcional
+    pub anonymized_key: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_anonymized: Option<String>,
     pub region: Option<String>,
@@ -21,7 +21,7 @@ pub struct ValidateParams {
     #[serde(default)]
     pub mask: Option<char>,
     #[serde(default)]
-    pub hash_type: Option<String>,  // Novo campo para escolher o algoritmo
+    pub hash_type: Option<String>, 
 }
 
 #[derive(Debug, Deserialize)]
@@ -30,7 +30,7 @@ pub struct BulkRequest {
     pub offset: Option<usize>,
     pub limit: Option<usize>,
     #[serde(default)]
-    pub hash_type: Option<String>,  // Novo campo para escolher o algoritmo
+    pub hash_type: Option<String>,  
 }
 
 #[derive(Debug, Serialize)]
