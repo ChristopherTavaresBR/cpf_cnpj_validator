@@ -47,16 +47,24 @@ pub fn validate_document(
 }
 
 fn validate_cpf(cpf: &str) -> bool {
-    if cpf.chars().all(|c| c == cpf.chars().next().unwrap()) {
+    let digits: Vec<u32> = cpf.chars().filter_map(|c| c.to_digit(10)).collect();
+
+    if digits.len() != 11 {
         return false;
     }
 
-    let digits: Vec<u32> = cpf.chars().filter_map(|c| c.to_digit(10)).collect();
+    if digits.windows(2).all(|w| w[0] == w[1]) {
+        return false;
+    }
 
-    let first_digit = (0..9).map(|i| digits[i] * (10 - i as u32)).sum::<u32>() % 11;
+    let first_digit = (0..9)
+        .map(|i| digits[i] * (10 - i as u32))
+        .sum::<u32>() % 11;
     let first_digit = if first_digit < 2 { 0 } else { 11 - first_digit };
 
-    let second_digit = (0..10).map(|i| digits[i] * (11 - i as u32)).sum::<u32>() % 11;
+    let second_digit = (0..10)
+        .map(|i| digits[i] * (11 - i as u32))
+        .sum::<u32>() % 11;
     let second_digit = if second_digit < 2 { 0 } else { 11 - second_digit };
 
     digits[9] == first_digit && digits[10] == second_digit
