@@ -6,6 +6,7 @@ use warp::{Filter, Reply};
 use std::convert::Infallible;
 use models::{ValidateParams, BulkRequest, ValidationResponse, BulkResponse};
 use validation::validate_document;
+use serde_json::json;
 
 async fn validate_handler(params: ValidateParams) -> Result<impl Reply, Infallible> {
     let show_ranges = params.show.as_ref().map(|s| {
@@ -64,8 +65,12 @@ async fn bulk_handler(body: BulkRequest) -> Result<impl Reply, Infallible> {
     }))
 }
 
+
+
+
 #[tokio::main]
 async fn main() {
+    // Rotas principais
     let validate_route = warp::path!("validate")
         .and(warp::get())
         .and(warp::query::<ValidateParams>())
@@ -77,8 +82,29 @@ async fn main() {
         .and(warp::body::json())
         .and_then(bulk_handler);
 
-    println!("Start server on http://localhost:3030");
-    warp::serve(validate_route.or(bulk_route))
-        .run(([127, 0, 0, 1], 3030))
+    // Health Check
+    let health_route = warp::path!("health")
+        .and(warp::get())
+        .map(|| warp::reply::json(&json!({"status": "ok"})));
+
+    // Configuração do servidor
+    let port = std::env::var("PORT")
+        .ok()
+        .and_then(|p| p.parse::<u16>().ok())
+        .unwrap_or(3030);
+
+    let host = std::env::var("HOST")
+        .unwrap_or_else(|_| "0.0.0.0".to_string());
+
+    println!("Server running on http://{}:{}", host, port);
+
+    // Combine todas as rotas
+    let routes = validate_route
+        .or(bulk_route)
+        .or(health_route)
+        .with(warp::log("api")); // Adiciona logging
+
+    warp::serve(routes)
+        .run(([0, 0, 0, 0], port)) // Sempre escuta em 0.0.0.0 para Docker
         .await;
 }

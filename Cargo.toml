@@ -1,7 +1,11 @@
 [package]
-name = "cpf_cnpj_validator"
+name = "cpf-cnpj-validator"
 version = "0.1.0"
 edition = "2021"
+
+[[bin]]
+name = "cpf-cnpj-validator"
+path = "src/main.rs"
 
 [dependencies]
 warp = "0.3"
@@ -13,3 +17,4 @@ sha-1 = "0.10.1"
 sha2 = "0.10.8"
 proptest = "1.0"
 criterion = "0.3"
+serde_json = "1.0.140"

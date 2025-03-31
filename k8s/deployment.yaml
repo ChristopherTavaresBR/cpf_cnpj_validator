@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cpf-cnpj-validator
+  labels:
+    app: cpf-cnpj-validator
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cpf-cnpj-validator
+  template:
+    metadata:
+      labels:
+        app: cpf-cnpj-validator
+    spec:
+      containers:
+      - name: cpf-cnpj-validator
+        image: ${DOCKER_REGISTRY}/cpf-cnpj-validator:${TAG}
+        ports:
+        - containerPort: 3030
+        env:
+        - name: PORT
+          value: "3030"
+        - name: HOST
+          value: "0.0.0.0"
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3030
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3030
+          initialDelaySeconds: 15
+          periodSeconds: 20
